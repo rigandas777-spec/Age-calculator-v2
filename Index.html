@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Age Calculator</title>
+<style>
+:root{--bg1:#141e30; --bg2:#292c38; --gold:#ffd700; --glass:rgba(255,255,255,0.08);}
+html,body{height:100%; margin:0; font-family:'Segoe UI',sans-serif;}
+body{background: linear-gradient(135deg,var(--bg1),var(--bg2)); color:#fff; display:flex; align-items:center; justify-content:center; padding:20px;}
+.container{max-width:435px; width:100%; background:var(--glass); padding:30px 18px 22px 18px; border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,0.45); text-align:center; position:relative;}
+h1{margin:4px 0 18px 0; font-size:28px; color:var(--gold);}
+.hint{margin-bottom:9px; color:#ffe066;}
+.row{display:flex;align-items:center;justify-content:center;margin-bottom:15px;gap:8px;}
+.calendar-wrap{position:relative;display:inline-block;}
+.input-date{ width:120px; padding:10px; border-radius:10px; border:none; background:rgba(255,255,255,0.09); color:#fff; font-size:16px; text-align:center;}
+input[type="date"].calendar-proxy{
+  opacity:0; position:absolute; left:0;top:0;width:100%;height:100%;border:none;cursor:pointer;z-index:10;
+}
+.calendar-btn{background:rgba(0,0,0,0.07);padding:10px 12px;border-radius:10px;border:none;color:var(--gold);font-size:18px;cursor:pointer;position:relative;z-index:1;}
+.present-date-label{color:#ffd700;font-weight:600;margin-right:7px;}
+button.calc, .extra-btn, .planet-btn, #backBtn, #backLifeBtn, #backPlanetBtn {
+  width:100%; padding:12px; border-radius:10px; font-size:16px; font-weight:600; border:none; cursor:pointer;
+  margin-bottom:10px; transition:background .13s;
+}
+button.calc {background:linear-gradient(90deg,var(--gold),#ffcc33); color:#000;}
+.extra-btn, .planet-btn {background: linear-gradient(90deg, #ffd700, #ffcc33); color: #000; margin-bottom: 10px;}
+#backBtn, #backLifeBtn, #backPlanetBtn {background:linear-gradient(90deg,#222,#333); color:var(--gold); display:none; margin-bottom:18px;}
+.age-big-box {display:flex; gap:18px; justify-content:center; background:rgba(30,30,30,0.98); padding:18px 0 14px 0; border-radius:14px; box-shadow:0 3px 18px rgba(30,30,10,.13);width:100%;margin-bottom:14px;}
+.ageval-col{flex:1;}
+.ageval-num{font-size:36px; color:var(--gold); font-weight:900;}
+.ageval-label{font-size:15px; font-weight:600; color:#ffe066; margin-top:2px; letter-spacing:.06em;}
+.next-birt-box{background:rgba(38,38,26,0.98); border-radius:12px; padding:12px 8px 9px 8px; margin:0 0 14px 0;text-align:center; font-size:18px;}
+.next-birthday-title{color:#ffd700; font-weight:bold; font-size:16px;}
+.next-bday-row{margin-top:5px; font-size:19px;}
+.next-day-label{color:#ffe066; font-size: 15px;}
+.birthday-countdown-box{padding:18px 0 10px 0;background:rgba(30,30,20,.93);border-radius:14px; display:flex;justify-content:center;gap:35px;align-items:center; margin:0 0 18px 0; font-weight:bold; letter-spacing:2px; box-shadow:0 2px 8px #0001;}
+.countdown-val{ font-size:26px; color:var(--gold); min-width:40px;transition:.13s;}
+.countdown-unit {font-size:13px;color:#ffe066;}
+.you-lived-box {background: rgba(255,255,255,0.10);border-radius:14px; padding:18px 10px 12px 10px; margin:0 0 16px 0;text-align:center; box-shadow:0 2px 16px rgba(0,0,0,.18);}
+.you-lived-title {color:#fff; font-size:18px; font-weight:700; margin-bottom:10px; letter-spacing:.5px; text-shadow:0 1px 4px #1119;}
+.youlived-grid {display:grid; grid-template-columns:repeat(2,1fr); gap:8px; font-size:16px;}
+.youlived-label {color:#ffd700; font-weight:600;}
+.youlived-val {font-size:18px; font-weight:700;}
+.life-btm-btns{margin-top:15px;}
+#lifeStatisticsPage, #planetsPage {display:none; width:100%; animation: fadeIn .5s;}
+.statistics-header, #planetsHeader {color: #ffd700; font-size: 23px; font-weight: bold; margin-bottom: 18px; letter-spacing: 1px; margin-top: 5px;}
+.stats-grid24, #planetsGrid {display:grid; grid-template-columns:1fr 1fr; gap:27px 16px; margin:0 0 18px 0;}
+.stats-cell, .planet-cell {background:rgba(40,30,10,0.97); box-shadow:0 2px 11px #241a09a0; border-radius:13px; padding:18px 10px 16px 10px; display:flex; flex-direction:column;align-items:center; min-height:90px; min-width:120px;}
+.stat-emoji, .planet-emoji {font-size:28px;filter: drop-shadow(0 1px 2px #000b);margin-bottom:6px;}
+.stats-label, .planet-label {color:#ffd700; font-weight:600; font-size:15px; margin-bottom:3px; text-align:center;}
+.stats-val, .planet-val {color:#fff; font-weight:bold; font-size:22px; margin-bottom:5px; margin-top:2px; letter-spacing:1px; text-shadow:0 1px 4px #1118;}
+.stats-reason, .planet-reason {font-size:13px; color:#ffe066; opacity:.90; margin-top:5px; text-align:center;}
+.lifestat-progressbox{background:rgba(38,38,26,0.97); box-shadow:0 2px 11px #241a09a0; border-radius:13px; padding:17px 10px 13px 10px; margin-bottom:16px;}
+.life-progress-title{font-weight:700; color:#ffd700;font-size:18px;margin-bottom:6px;}
+.life-progress-bignum{font-size:38px;font-weight:bold;color:#ffd700; margin-bottom:2px;}
+.life-progress-desc{color:#ffe066;font-size:15px;}
+.lifestat-daybox{background:rgba(38,38,26,0.93);border-radius:13px;margin-bottom:16px;padding:12px 9px 9px 9px;}
+.life-day-title{font-weight:700; color:#ffd700;font-size:17px;margin-bottom:4px;}
+.life-day-desc{color:#ffe066;font-size:15px;}
+@media (max-width:500px){
+  .container{padding:9px 1vw;}
+  .stats-cell, .planet-cell{min-width:95px;padding:13px 2px 9px 2px;}
+  .stats-grid24, #planetsGrid{gap:16px 6px;}
+}
+@keyframes fadeIn{ from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:none} }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <div id="inputArea">
+    <h1>Age Calculator</h1>
+    <div class="row">
+      <span class="present-date-label">Present Date:</span>
+      <input type="text" inputmode="numeric" class="input-date" id="presentDateInput" maxlength="10" placeholder="DD/MM/YYYY" autocomplete="off" />
+      <span class="calendar-wrap">
+        <button type="button" class="calendar-btn" tabindex="-1">📅</button>
+        <input type="date" class="calendar-proxy" id="presentDatePicker">
+      </span>
+    </div>
+    <div class="row">
+      <input type="text" inputmode="numeric" class="input-date" id="dobInput" maxlength="10" placeholder="DD/MM/YYYY" autocomplete="off" />
+      <span class="calendar-wrap">
+        <button type="button" class="calendar-btn" tabindex="-1">📅</button>
+        <input type="date" class="calendar-proxy" id="dobPicker">
+      </span>
+    </div>
+    <button class="calc" id="calcBtn">Calculate Age</button>
+    <div class="hint">(Type your DOB or use calendar)</div>
+    <div class="hint" id="typeHint" style="color:#FFD0D0;"></div>
+  </div>
+  <button id="backBtn">← Back</button>
+  <div id="resultPage" style="display:none;">
+    <div class="age-big-box" id="ageBigBox">
+      <div class="ageval-col"><div class="ageval-num" id="ageYears">0</div><div class="ageval-label">Years</div></div>
+      <div class="ageval-col"><div class="ageval-num" id="ageMonths">0</div><div class="ageval-label">Months</div></div>
+      <div class="ageval-col"><div class="ageval-num" id="ageDays">0</div><div class="ageval-label">Days</div></div>
+    </div>
+    <div class="next-birt-box">
+      <div class="next-birthday-title">NEXT BIRTHDAY</div>
+      <div class="next-bday-row"><span id="nextBdayDate"></span></div>
+      <div class="next-day-label" id="nextBdayWeekday"></div>
+    </div>
+    <div class="birthday-countdown-box" id="birthdayCountdownBox">
+      <div><div class="countdown-val" id="cdDays">00</div><div class="countdown-unit">DAYS</div></div>
+      <div><div class="countdown-val" id="cdHours">00</div><div class="countdown-unit">HOURS</div></div>
+      <div><div class="countdown-val" id="cdMins">00</div><div class="countdown-unit">MINUTES</div></div>
+      <div><div class="countdown-val" id="cdSecs">00</div><div class="countdown-unit">SECONDS</div></div>
+    </div>
+    <div class="you-lived-box" style="margin-bottom:18px;">
+      <div class="you-lived-title">YOU ALREADY LIVED</div>
+      <div class="youlived-grid" id="youLivedGrid"></div>
+    </div>
+    <div class="life-btm-btns">
+      <button class="extra-btn" id="lifeStatsBtn2">Show Life Statistics</button>
+      <button class="planet-btn" id="planetBtn">🌍 Age On Different Planets</button>
+    </div>
+  </div>
+  <div id="lifeStatisticsPage">
+    <button id="backLifeBtn">← Back</button>
+    <!-- New: Life Progress -->
+    <div class="lifestat-progressbox" id="lifeProgressBox">
+      <div class="life-progress-title">Life progress</div>
+      <div class="life-progress-bignum" id="lifeProgressPercent">0%</div>
+      <div class="life-progress-desc" id="lifeProgressDesc"></div>
+    </div>
+    <!-- New: Day of Life -->
+    <div class="lifestat-daybox" id="dayOfLifeBox">
+      <div class="life-day-title">A day of life</div>
+      <div class="life-day-desc" id="lifeDayDesc"></div>
+    </div>
+    <div class="statistics-header">Your Life Statistics</div>
+    <div class="stats-grid24" id="lifeStatsGrid"></div>
+  </div>
+  <div id="planetsPage">
+    <button id="backPlanetBtn">← Back</button>
+    <div id="planetsHeader">Your Age On Different Planets</div>
+    <div id="planetsGrid"></div>
+  </div>
+</div>
+<script>
+function pad(n) {return n<10?'0'+n:n;}
+const el=id=>document.getElementById(id);
+let calcBirth = null, calcPresentDate = null;
+let liveCountdownInterval = null;
+let youLivedInterval = null;
+const AVG_LIFE_EXPECTANCY = 73; // years; edit to your country if desired
+window.addEventListener('DOMContentLoaded', function(){
+  let today = new Date();
+  el('presentDateInput').value = formatDate(today);
+  el('presentDatePicker').value = today.toISOString().slice(0,10);
+});
+function formatTypedDate(val) {
+  val = val.replace(/[^0-9]/g,"");
+  if(val.length > 8) val = val.slice(0,8);
+  let out = "";
+  if(val.length > 0) out += val.slice(0,2);
+  if(val.length >= 3) out += "/" + val.slice(2,4);
+  else if(val.length > 2) out += "/" + val.slice(2);
+  if(val.length > 4) out += "/" + val.slice(4);
+  return out;
+}
+['presentDateInput','dobInput'].forEach(function(id){
+  el(id).addEventListener('input', function(){
+    let pos = this.selectionStart;
+    let oldVal = this.value;
+    let formatted = formatTypedDate(oldVal);
+    this.value = formatted;
+    if(pos === oldVal.length) {
+      if(formatted.length === 2 || formatted.length === 5) this.selectionStart = this.selectionEnd = formatted.length+1;
+      else this.selectionStart = this.selectionEnd = formatted.length;
+    }
+    let field = (id==='presentDateInput') ? el('presentDatePicker') : el('dobPicker');
+    let dt=parseTypedDate(formatted);
+    if(dt) field.value = dt.toISOString().slice(0,10);
+  });
+});
+el('presentDatePicker').addEventListener('input',function(){
+  let dt=new Date(this.value);
+  if(dt && !isNaN(dt)) el('presentDateInput').value = formatDate(dt);
+});
+el('dobPicker').addEventListener('input',function(){
+  let dt=new Date(this.value);
+  if(dt && !isNaN(dt)) el('dobInput').value = formatDate(dt);
+});
+function formatDate(date) { return pad(date.getDate())+'/'+pad(date.getMonth()+1)+'/'+date.getFullYear();}
+function parseTypedDate(str){
+  if(!str) return null;
+  let [d,m,y]=str.split('/');
+  if(!d||!m||!y) return null;
+  let date = new Date(Number(y), Number(m)-1, Number(d));
+  if(date && date.getDate()==Number(d) && date.getMonth()==(Number(m)-1) && date.getFullYear()==Number(y)) return date;
+  return null;
+}
+function showInputView() {
+  el('inputArea').style.display = 'block';
+  el('resultPage').style.display = 'none';
+  el('backBtn').style.display = 'none';
+  el('lifeStatisticsPage').style.display = 'none';
+  el('planetsPage').style.display = 'none';
+  el('typeHint').textContent = '';
+  clearIntervals();
+}
+function showResultView() {
+  el('inputArea').style.display = 'none';
+  el('resultPage').style.display = 'block';
+  el('backBtn').style.display = 'block';
+  el('lifeStatisticsPage').style.display = 'none';
+  el('planetsPage').style.display = 'none';
+  clearIntervals();
+}
+function clearIntervals(){
+  if(liveCountdownInterval) clearInterval(liveCountdownInterval);
+  if(youLivedInterval) clearInterval(youLivedInterval);
+  liveCountdownInterval = null; youLivedInterval = null;
+}
+el('backBtn').onclick = showInputView;
+el('backLifeBtn').onclick = function(){
+  el('lifeStatisticsPage').style.display = 'none';
+  showResultView();
+};
+el('backPlanetBtn').onclick = function(){
+  el('planetsPage').style.display = "none";
+  showResultView();
+};
+el('calcBtn').onclick = function() {
+  let present = parseTypedDate(el('presentDateInput').value);
+  let birth = parseTypedDate(el('dobInput').value);
+  if(!present) {el('typeHint').textContent = "Please enter correct present date.";return;}
+  if(!birth) {el('typeHint').textContent = "Please enter correct date of birth.";return;}
+  if(birth>present){el('typeHint').textContent="Date of birth can't be after present date!";return;}
+  el('typeHint').textContent="";
+  calcPresentDate = present; calcBirth = birth;
+  buildResultPage(calcBirth, calcPresentDate);
+  showResultView();
+};
+document.querySelectorAll('.calendar-wrap').forEach(function(calwrap){
+  let btn = calwrap.querySelector('button.calendar-btn');
+  let picker = calwrap.querySelector('input[type="date"].calendar-proxy');
+  btn.addEventListener('click',function(){ picker.focus(); picker.click(); });
+});
+function buildResultPage(birth, currentDay) {
+  clearIntervals();
+  let years = currentDay.getFullYear() - birth.getFullYear();
+  let months = currentDay.getMonth() - birth.getMonth();
+  let days = currentDay.getDate() - birth.getDate();
+  if (days < 0) {months--; days += new Date(currentDay.getFullYear(), currentDay.getMonth(), 0).getDate();}
+  if (months < 0) {years--; months += 12;}
+  el('ageYears').textContent = years;
+  el('ageMonths').textContent = months;
+  el('ageDays').textContent = days;
+  const monthsArr = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  let nextB = new Date(currentDay.getFullYear(), birth.getMonth(), birth.getDate());
+  if(nextB < currentDay) nextB.setFullYear(currentDay.getFullYear() + 1);
+  el('nextBdayDate').textContent = pad(nextB.getDate()) + " " + monthsArr[nextB.getMonth()] + " " + nextB.getFullYear();
+  const daysArr = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  el('nextBdayWeekday').textContent = daysArr[nextB.getDay()];
+  function renderCountdown(delta) {
+    let d = Math.floor(delta/(1000*60*60*24));
+    let h = Math.floor((delta/(1000*60*60))%24);
+    let m = Math.floor((delta/(1000*60))%60);
+    let s = Math.floor((delta/1000)%60);
+    el('cdDays').textContent = pad(d>=0?d:0);
+    el('cdHours').textContent = pad(h>=0?h:0);
+    el('cdMins').textContent = pad(m>=0?m:0);
+    el('cdSecs').textContent = pad(s>=0?s:0);
+  }
+  function liveCountdownLoop(){
+    let now = new Date();
+    let realtimeNextB = new Date(nextB.getTime());
+    if(realtimeNextB < now) realtimeNextB.setFullYear(realtimeNextB.getFullYear()+1);
+    let delta = realtimeNextB-now;
+    renderCountdown(delta);
+  }
+  liveCountdownLoop();
+  liveCountdownInterval = setInterval(liveCountdownLoop, 100);
+  function livedUnits(){
+    let diff = currentDay-birth;
+    let ly = currentDay.getFullYear()-birth.getFullYear();
+    let lm = ly*12 + currentDay.getMonth()-birth.getMonth();
+    let lw = Math.floor(diff/(1000*60*60*24*7));
+    let ld = Math.floor(diff/(1000*60*60*24));
+    let lh = Math.floor(diff/(1000*60*60));
+    let lmin = Math.floor(diff/(1000*60));
+    let ls = Math.floor(diff/1000);
+    el('youLivedGrid').innerHTML=`
+      <div class="youlived-label">Years</div> <div class="youlived-val">${ly}</div>
+      <div class="youlived-label">Months</div> <div class="youlived-val">${lm}</div>
+      <div class="youlived-label">Weeks</div> <div class="youlived-val">${lw}</div>
+      <div class="youlived-label">Days</div> <div class="youlived-val">${ld}</div>
+      <div class="youlived-label">Hours</div> <div class="youlived-val">${lh}</div>
+      <div class="youlived-label">Minutes</div> <div class="youlived-val">${lmin}</div>
+      <div class="youlived-label">Seconds</div> <div class="youlived-val" id="youLivedSecs">${ls}</div>
+    `;
+  }
+  livedUnits();
+  youLivedInterval = setInterval(()=>{
+    let diff = currentDay - birth;
+    el('youLivedSecs').textContent = Math.floor(diff/1000);
+  },1000);
+}
+// Life stats: now with 🏅 (medal) for "Total Years Lived"
+const emojiList=[
+  "🎂","📅","📆","🗓️","🏅","🔢","⏰","⌛","⏳","❤️","😄","😴","🚶","🦶",
+  "🌅","💧","📚","📞","🧠","📸"
+];
+const statLabels=[
+  "Current Age (years)",
+  "Current Age (days)",
+  "Total Weeks Lived",
+  "Total Months Lived",
+  "Total Years Lived",
+  "Total Days (incl. leap days)",
+  "Total Hours Lived",
+  "Total Minutes Lived",
+  "Total Seconds Lived",
+  "Heartbeats (est.)",
+  "Smiles (est.)",
+  "Hours Slept (avg 8/day)",
+  "Steps Walked (avg 5k/day)",
+  "Kilometers Walked (est.)",
+  "Sunrises Seen",
+  "Litres of Water Drunk (est.)",
+  "Books Read (est.)",
+  "Phone Calls Made (est.)",
+  "Decisions Made (est.)",
+  "Photographs Taken (est.)"
+];
+const statReasons=[
+  "From your date of birth to present date",
+  "Calculated including leap years",
+  "7 days/week × weeks since birth",
+  "12 months/year × years since birth",
+  "Full years completed since birth",
+  "Includes extra leap days",
+  "24 hours/day since birth",
+  "60 minutes/hour × hours lived",
+  "60 seconds/min × minutes lived",
+  "Avg 75 bpm × seconds lived",
+  "Estimated: 20 smiles/day",
+  "Avg 8 hours sleep per day",
+  "Avg 5000 steps walked per day",
+  "Avg step ≈ 0.8m (5000 steps/day)",
+  "One for every day lived",
+  "Assumed ~2.5L water/day",
+  "Avg 9 books read per year",
+  "Avg 1.8 calls per day",
+  "Estimated 300 decisions each day",
+  "Avg person snaps 146 photos/year"
+];
+function calculateLifeStats(birth,presentDay){
+  const now=presentDay;
+  const ageY=now.getFullYear()-birth.getFullYear()-(now.getMonth()<birth.getMonth()||(now.getMonth()===birth.getMonth()&&now.getDate()<birth.getDate()));
+  const ageD=Math.floor((now-birth)/(1000*60*60*24));
+  const weeks=Math.floor(ageD/7);
+  const months=(now.getFullYear()-birth.getFullYear())*12+(now.getMonth()-birth.getMonth());
+  const years=ageY;
+  const totalDaysInclLeap=ageD;
+  const hours=ageD*24;
+  const minutes=hours*60;
+  const seconds=minutes*60;
+  const heartbeats=Math.floor(seconds/0.8);
+  const smiles=ageD*20;
+  const hoursSlept=ageD*8;
+  const steps=ageD*5000;
+  const kmWalked=Math.floor(steps*0.8/1000);
+  const sunrises=ageD;
+  const litresWater=Math.floor(ageD*2.5);
+  const books=Math.round(years*9+months/12*9);
+  const phoneCalls=Math.round(ageD*1.8);
+  const decisions=Math.round(ageD*300);
+  const photos=Math.round(years*146);
+  return[
+    years,ageD,weeks,months,years,totalDaysInclLeap,hours,minutes,seconds,heartbeats,smiles,hoursSlept,steps,kmWalked,
+    sunrises,litresWater,books,phoneCalls,decisions,photos
+  ];
+}
+el('lifeStatsBtn2').onclick=function(){
+  if(!calcBirth||!calcPresentDate){alert("Calculate age first!");return;}
+  // ==== LIFE PROGRESS/PROGRESS BAR + A DAY OF LIFE SECTION ====
+  const now = calcPresentDate;
+  const birth = calcBirth;
+  const avgLifeSpan = AVG_LIFE_EXPECTANCY;
+  let diffDays = Math.floor((now-birth)/(1000*60*60*24));
+  let diffYears = (now-birth)/(1000*60*60*24*365.25);
+  let progress = Math.max(0,Math.min(100, (diffYears/avgLifeSpan)*100));
+  el('lifeProgressPercent').textContent = Math.floor(progress)+"%";
+  el('lifeProgressDesc').textContent = `You have lived ${Math.floor(progress)}% of the average lifespan (${avgLifeSpan} yrs).`;
+  // A day of life mapping
+  let dayMinutes = 24*60, livedMinutes = (progress/100)*dayMinutes;
+  let hr = Math.floor(livedMinutes/60), min = Math.floor(livedMinutes%60);
+  let ampm = hr<12?'AM':'PM', hrdt = hr%24;
+  let displayTime = `${pad(hrdt)}:${pad(min)} ${ampm}`;
+  el('lifeDayDesc').textContent = `If life were a day, you are at ${displayTime}.`;
+  // ==== MAIN STATS GRID ====
+  const values = calculateLifeStats(birth,now);
+  let gridHTML="";
+  for(let i=0;i<statLabels.length;i++){
+    gridHTML+=`
+      <div class="stats-cell">
+        <div class="stat-emoji">${emojiList[i]}</div>
+        <div class="stats-label">${statLabels[i]}</div>
+        <div class="stats-val">${values[i].toLocaleString()}</div>
+        <div class="stats-reason">${statReasons[i]}</div>
+      </div>
+    `;
+  }
+  el('lifeStatsGrid').innerHTML=gridHTML;
+  el('resultPage').style.display="none";
+  el('backBtn').style.display="none";
+  el('lifeStatisticsPage').style.display="block";
+  el('backLifeBtn').style.display="block";
+};
+// PLANETS stays the same
+const planetEmoji = ["☿️","♀️","🌍","♂️","♃","♄","♅","♆"];
+const planetName = ["Mercury","Venus","Earth","Mars","Jupiter","Saturn","Uranus","Neptune"];
+const planetYearLength = [0.2408467,0.61519726,1,1.8808158,11.862615,29.447498,84.016846,164.79132];
+const planetReason=[
+  "1 Mercury year = 0.24 Earth years",
+  "1 Venus year = 0.62 Earth years",
+  "Earth = what you know",
+  "1 Mars year = 1.88 Earth years",
+  "1 Jupiter year = 11.86 Earth years",
+  "1 Saturn year = 29.45 Earth years",
+  "1 Uranus year = 84.02 Earth years",
+  "1 Neptune year = 164.79 Earth years"
+];
+el('planetBtn').onclick=function(){
+  if(!calcBirth||!calcPresentDate){alert("Calculate age first!");return;}
+  const ageEarth = (calcPresentDate-calcBirth)/(1000*60*60*24*365.25);
+  let grid = "";
+  for(let i=0;i<planetEmoji.length;i++){
+    let planetAge = ageEarth/planetYearLength[i];
+    grid += `
+      <div class="planet-cell">
+        <div class="planet-emoji">${planetEmoji[i]}</div>
+        <div class="planet-label">${planetName[i]}</div>
+        <div class="planet-val">${planetAge.toFixed(2)} yrs</div>
+        <div class="planet-reason">${planetReason[i]}</div>
+      </div>
+    `;
+  }
+  el('planetsGrid').innerHTML = grid;
+  el('resultPage').style.display="none";
+  el('backBtn').style.display = "none";
+  el('planetsPage').style.display="block";
+  el('backPlanetBtn').style.display="block";
+};
+</script>
+</body>
+</html>
