@@ -64,6 +64,22 @@ button.calc {background:linear-gradient(90deg,var(--gold),#ffcc33); color:#000;}
   .stats-grid24, #planetsGrid{gap:16px 6px;}
 }
 @keyframes fadeIn{ from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:none} }
+@media (max-width:500px){
+  .container{padding:10px 3vw; max-width:99vw;}
+  .stats-cell, .planet-cell{min-width:95px; padding:13px 2px 9px 2px;}
+  .stats-grid24, #planetsGrid{gap:16px 6px;}
+}
+@media (max-width:400px){
+  h1{font-size:20px;}
+  .container{padding:6px 1vw;}
+  .age-big-box{flex-direction:column; gap:10px;}
+  .youlived-grid, .stats-grid24, #planetsGrid{grid-template-columns:1fr;}
+  .stats-cell, .planet-cell{min-width:1px; padding:10px 2px;}
+  button, .calc, .extra-btn, .planet-btn, #backBtn, #backLifeBtn, #backPlanetBtn {font-size:14px;}
+}
+html,body{height:auto; min-height:100%;}
+body{overflow-x:hidden; overflow-y:auto;}
+
 </style>
 </head>
 <body>
