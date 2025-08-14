@@ -326,12 +326,10 @@ function clearIntervals(){
 }
 el('backBtn').onclick = showInputView;
 el('backLifeBtn').onclick = function(){
-  el('lifeStatisticsPage').style.display = 'none';
-  showResultView();
+  history.back();
 };
 el('backPlanetBtn').onclick = function(){
-  el('planetsPage').style.display = "none";
-  showResultView();
+  history.back();
 };
 el('calcBtn').onclick = function() {
   let present = parseTypedDate(el('presentDateInput').value);
@@ -673,8 +671,7 @@ document.getElementById('greatThingsBtn').onclick = function(){
 };
 
 document.getElementById('backGreatThingsBtn').onclick = function(){
-  document.getElementById('greatThingsPage').style.display = "none";
-  showResultView();
+  history.back();
 };
 
 // Modify your navigation calls:
@@ -725,6 +722,7 @@ window.addEventListener('popstate', function (e) {
 // On FIRST LOAD, set the base state
 window.addEventListener('DOMContentLoaded', ()=> {
   history.replaceState({pageId: 'inputArea'}, "");
+  navShow('inputArea'); // Always land user at DOB input
 });
 
 </script>
