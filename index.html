@@ -308,6 +308,7 @@ function showInputView() {
   el('planetsPage').style.display = 'none';
   el('typeHint').textContent = '';
   clearIntervals();
+  navShow('inputArea');
 }
 function showResultView() {
   el('inputArea').style.display = 'none';
@@ -316,6 +317,7 @@ function showResultView() {
   el('lifeStatisticsPage').style.display = 'none';
   el('planetsPage').style.display = 'none';
   clearIntervals();
+  navShow('resultPage');
 }
 function clearIntervals(){
   if(liveCountdownInterval) clearInterval(liveCountdownInterval);
@@ -518,6 +520,7 @@ el('lifeStatsBtn2').onclick=function(){
   el('backBtn').style.display="none";
   el('lifeStatisticsPage').style.display="block";
   el('backLifeBtn').style.display="block";
+    navShow('lifeStatisticsPage');
 };
 // PLANETS stays the same
 const planetEmoji = ["☿️","♀️","🌍","♂️","♃","♄","♅","♆"];
@@ -553,6 +556,7 @@ el('planetBtn').onclick=function(){
   el('backBtn').style.display = "none";
   el('planetsPage').style.display="block";
   el('backPlanetBtn').style.display="block";
+    navShow('planetsPage');
 };
   // ==== Great Things Data (1940–2025) ====
 const greatThingsData = {
@@ -665,13 +669,64 @@ document.getElementById('greatThingsBtn').onclick = function(){
   document.getElementById('backBtn').style.display = "none";
   document.getElementById('greatThingsPage').style.display = "block";
   document.getElementById('backGreatThingsBtn').style.display = "block";
+  navShow('greatThingsPage');
 };
 
 document.getElementById('backGreatThingsBtn').onclick = function(){
   document.getElementById('greatThingsPage').style.display = "none";
   showResultView();
 };
-  
+
+// Modify your navigation calls:
+//  - after showResultView(), call navShow('resultPage');
+//
+// --- SPA/Back Button Navigation (copy-paste-ready) ---
+let exitPrompted = false;
+
+// Universal page switch (call after ANY main page change)
+function navShow(pageId) {
+  // Hide all "pages"
+  ['inputArea','resultPage','lifeStatisticsPage','planetsPage','greatThingsPage'].forEach(id=>{
+    let node = document.getElementById(id);
+    if(node) node.style.display = 'none';
+  });
+  // Show target page
+  let page = document.getElementById(pageId);
+  if (page) {
+    if (pageId === 'greatThingsPage') page.style.display = 'flex';
+    else page.style.display = 'block';
+  }
+  document.getElementById('backBtn').style.display = (pageId==='resultPage') ? 'block' : 'none';
+  // Only push if not coming from popstate event
+  if(!navShow.__fromPop) history.pushState({pageId}, "");
+  navShow.__fromPop = false;
+}
+
+// Handle the hardware/browser/app back button
+window.addEventListener('popstate', function (e) {
+  const pageId = (e.state && e.state.pageId) || 'inputArea';
+  navShow.__fromPop = true;
+  if (pageId === 'inputArea') {
+    if (exitPrompted) {
+      exitPrompted = false;
+      history.go(-1); // Now browser/PWA/app closes
+    } else {
+      exitPrompted = true;
+      alert('Press back again to exit');
+      history.pushState({ pageId: 'inputArea' }, "");
+      setTimeout(() => { exitPrompted = false; }, 1500);
+    }
+  } else {
+    navShow(pageId);
+    exitPrompted = false;
+  }
+});
+
+// On FIRST LOAD, set the base state
+window.addEventListener('DOMContentLoaded', ()=> {
+  history.replaceState({pageId: 'inputArea'}, "");
+});
+
 </script>
 </body>
 </html>
