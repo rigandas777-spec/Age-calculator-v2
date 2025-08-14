@@ -324,7 +324,7 @@ function clearIntervals(){
   if(youLivedInterval) clearInterval(youLivedInterval);
   liveCountdownInterval = null; youLivedInterval = null;
 }
-el('backBtn').onclick = showInputView;
+el('backBtn').onclick = function() { history.back(); };
 el('backLifeBtn').onclick = function(){
   history.back();
 };
