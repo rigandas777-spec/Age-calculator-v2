@@ -316,7 +316,6 @@ function showResultView() {
   el('backBtn').style.display = 'block';
   el('lifeStatisticsPage').style.display = 'none';
   el('planetsPage').style.display = 'none';
-  clearIntervals();
   navShow('resultPage');
 }
 function clearIntervals(){
@@ -375,15 +374,23 @@ function buildResultPage(birth, currentDay) {
     el('cdMins').textContent = pad(m>=0?m:0);
     el('cdSecs').textContent = pad(s>=0?s:0);
   }
-  function liveCountdownLoop(){
-    let now = new Date();
-    let realtimeNextB = new Date(nextB.getTime());
-    if(realtimeNextB < now) realtimeNextB.setFullYear(realtimeNextB.getFullYear()+1);
-    let delta = realtimeNextB-now;
-    renderCountdown(delta);
+// COUNTDOWN: updates every second in real-time
+function liveCountdownLoop() {
+  let now = new Date(); // real time
+  let realtimeNextB = new Date(now.getFullYear(), birth.getMonth(), birth.getDate());
+
+  if (realtimeNextB < now) {
+    realtimeNextB.setFullYear(realtimeNextB.getFullYear() + 1);
   }
-  liveCountdownLoop();
-  liveCountdownInterval = setInterval(liveCountdownLoop, 100);
+
+  let delta = realtimeNextB - now;
+  renderCountdown(delta);
+}
+
+if (liveCountdownInterval) clearInterval(liveCountdownInterval);
+liveCountdownLoop(); // run now
+liveCountdownInterval = setInterval(liveCountdownLoop, 1000);
+
   function livedUnits(){
     let diff = currentDay-birth;
     let ly = currentDay.getFullYear()-birth.getFullYear();
@@ -404,10 +411,32 @@ function buildResultPage(birth, currentDay) {
     `;
   }
   livedUnits();
-  youLivedInterval = setInterval(()=>{
-    let diff = currentDay - birth;
-    el('youLivedSecs').textContent = Math.floor(diff/1000);
-  },1000);
+  function liveLivedUnits() {
+  let now = new Date();
+  let diff = now - birth;
+  let ly = now.getFullYear() - birth.getFullYear();
+  let lm = ly * 12 + now.getMonth() - birth.getMonth();
+  let lw = Math.floor(diff / (1000*60*60*24*7));
+  let ld = Math.floor(diff / (1000*60*60*24));
+  let lh = Math.floor(diff / (1000*60*60));
+  let lmin = Math.floor(diff / (1000*60));
+  let ls = Math.floor(diff / 1000);
+
+  el('youLivedGrid').innerHTML = `
+    <div class="youlived-label">Years</div> <div class="youlived-val">${ly}</div>
+    <div class="youlived-label">Months</div> <div class="youlived-val">${lm}</div>
+    <div class="youlived-label">Weeks</div> <div class="youlived-val">${lw}</div>
+    <div class="youlived-label">Days</div> <div class="youlived-val">${ld}</div>
+    <div class="youlived-label">Hours</div> <div class="youlived-val">${lh}</div>
+    <div class="youlived-label">Minutes</div> <div class="youlived-val">${lmin}</div>
+    <div class="youlived-label">Seconds</div> <div class="youlived-val" id="youLivedSecs">${ls}</div>
+  `;
+}
+
+if (youLivedInterval) clearInterval(youLivedInterval);
+liveLivedUnits(); // initial display
+youLivedInterval = setInterval(liveLivedUnits, 1000);
+
 }
 // Life stats: now with 🏅 (medal) for "Total Years Lived"
 const emojiList=[
@@ -623,7 +652,7 @@ const greatThingsData = {
   2003:["Human genome mapped","LinkedIn","Toyota Prius mass sales"],
   2004:["Facebook","Mars rover Spirit","Podcasts"],
   2005:["YouTube","Google Maps","Xbox 360"],
-  2006:["Twitter Invented","Blu-ray disc","Pluto demoted"],
+  2006:["Twitter","Blu-ray disc","Pluto demoted"],
   2007:["iPhone","Kindle","Airbnb"],
   2008:["Android phones","Tesla Roadster","Bitcoin whitepaper"],
   2009:["4G network","Bitcoin live","FitBit tracker"],
