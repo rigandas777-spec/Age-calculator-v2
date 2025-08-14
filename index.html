@@ -80,6 +80,85 @@ button.calc {background:linear-gradient(90deg,var(--gold),#ffcc33); color:#000;}
 html,body{height:auto; min-height:100%;}
 body{overflow-x:hidden; overflow-y:auto;}
 
+  .great-things-premium-card {
+  max-width: 420px;
+  margin: 38px auto 30px auto;
+  background: linear-gradient(122deg,#24243e 68%, #ffd70025 100%);
+  border-radius: 21px;
+  box-shadow: 0 7px 32px #18183b55, 0 1.5px 8px #ffd70035;
+  padding: 29px 21px 20px 21px;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Back button as icon at TOP LEFT */
+.great-things-premium-back {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(90deg,#222,#ffd70030);
+  color: #ffd700;
+  border: none;
+  border-radius: 100px;
+  width: 39px; height: 39px;
+  font-size: 1.34em;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 2px 8px #0002;
+  transition: background .13s, color .12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.great-things-premium-back:hover {
+  background: linear-gradient(90deg,#26277a,#ffd70070 90%);
+  color: #fff;
+}
+
+/* Panel title */
+.great-things-premium-title {
+  font-size: 2em;
+  color: #ffd700;
+  font-weight: 900;
+  margin-bottom: 21px;
+  letter-spacing: 1px;
+  text-shadow: 0 3px 12px #0009;
+  margin-top: 7px;
+}
+
+/* List appearance */
+.great-things-premium-list {
+  margin: 0 auto 0 auto;
+  padding-left: 0;
+  list-style: none;
+  max-width: 97%;
+}
+.great-things-premium-list li {
+  background: rgba(255,215,0,0.11);
+  box-shadow: 0 2px 12px #ffd6000c;
+  color: #fffce9;
+  border-radius: 9px;
+  margin-bottom: 15px;
+  padding: 14px 16px 13px 13px;
+  font-size: 1.1em;
+  font-weight: 530;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-left: 5px solid #ffd700e3;
+}
+.great-things-premium-list li::before {
+  content: "✨";
+  color: #ffd700;
+  font-size: 1.22em;
+  margin-right: 8px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
 </style>
 </head>
 <body>
@@ -129,6 +208,7 @@ body{overflow-x:hidden; overflow-y:auto;}
     </div>
     <div class="life-btm-btns">
       <button class="extra-btn" id="lifeStatsBtn2">Show Life Statistics</button>
+      <button class="extra-btn" id="greatThingsBtn">✨ Great Things in My Birth Year</button>
       <button class="planet-btn" id="planetBtn">🌍 Age On Different Planets</button>
     </div>
   </div>
@@ -152,6 +232,18 @@ body{overflow-x:hidden; overflow-y:auto;}
     <button id="backPlanetBtn">← Back</button>
     <div id="planetsHeader">Your Age On Different Planets</div>
     <div id="planetsGrid"></div>
+    </div>
+    <!-- Premium Great Things page: put after planetsPage, at the bottom -->
+<div id="greatThingsPage" style="display:none;">
+  <div class="great-things-premium-card">
+    <!-- Back button at TOP LEFT -->
+    <button class="great-things-premium-back" id="backGreatThingsBtn" aria-label="Back">
+      ←
+    </button>
+    <div class="great-things-premium-title">
+      ✨ Great Things in <span id="great-things-year"></span> ✨
+    </div>
+    <ul id="great-things-list" class="great-things-premium-list"></ul>
   </div>
 </div>
 <script>
@@ -462,6 +554,124 @@ el('planetBtn').onclick=function(){
   el('planetsPage').style.display="block";
   el('backPlanetBtn').style.display="block";
 };
+  // ==== Great Things Data (1940–2025) ====
+const greatThingsData = {
+  1940:["Color TV","Jeep","WWII – Battle of Britain"],
+  1941:["Radar for planes","Penicillin (mass produced)","Pearl Harbor attack"],
+  1942:["First nuclear reactor","Guided missiles","Duct tape invented"],
+  1943:["First digital computer (Colossus)","Scuba gear (Aqualung)","Ballpoint pen"],
+  1944:["Dialysis machine","D-Day landings","Sun lamp for vitamin D"],
+  1945:["Atomic bomb","Microwave oven","End of WWII"],
+  1946:["ENIAC computer","Tupperware","Sunscreen lotion"],
+  1947:["Transistor invented","Polaroid sunglasses","India/Pakistan independence"],
+  1948:["Velcro fasteners","LP vinyl record","Electric guitar (Fender)"],
+  1949:["Polaroid instant camera","NATO formed","Cake mix (ready-made)"],
+  1950:["First credit card","TV remote control","Korean War starts"],
+  1951:["Video tape recorder","Nuclear power station","Super glue"],
+  1952:["Hydrogen bomb test","Mr. Potato Head toy","Barcode concept"],
+  1953:["DNA structure found","Polio vaccine trial","Everest summit"],
+  1954:["Solar cell","Commercial microwave oven","RCA color TV"],
+  1955:["Polio vaccine widely used","Atomic clock","LEGO blocks"],
+  1956:["First computer hard disk","Suez Crisis","Velcro shoes marketed"],
+  1957:["Sputnik satellite","Nonstick frying pan","Birth control pill"],
+  1958:["Integrated circuit (microchip)","Hula Hoop","NASA created"],
+  1959:["Heart pacemaker","Barbie doll","Xerox copier machine"],
+  1960:["Laser","First cordless tools","Birth control pill sold"],
+  1961:["Yuri Gagarin—man in space","Electric toothbrush","IBM Selectric typewriter"],
+  1962:["Telstar TV satellite","Audio cassette","LED light"],
+  1963:["Cassette tape","Push-button phone","JFK assassination"],
+  1964:["Computer mouse","LCD screen","Ford Mustang car"],
+  1965:["Space walk","Compact 8-track tape","Soft contact lenses"],
+  1966:["Photos of Moon surface","Pampers diapers","Mini skirt fashion"],
+  1967:["ATM machine","Handheld calculator","First heart transplant"],
+  1968:["Boeing 747 jet","Computer mouse demo","Apollo 8—moon orbit"],
+  1969:["Apollo 11 Moon landing","Internet (ARPANET)","Battery smoke detector"],
+  1970:["Earth Day","Pocket calculator","VCR players"],
+  1971:["Intel microprocessor","Email","Floppy disk"],
+  1972:["CT scanner","Pong video game","Digital watch"],
+  1973:["First mobile phone (prototype)","Ethernet network","Post-it notes"],
+  1974:["Barcodes scanned in stores","Rubik’s Cube","Liposuction surgery"],
+  1975:["First personal computer","Microsoft founded","Digital camera concept"],
+  1976:["Apple company","Concorde flights","VHS tape"],
+  1977:["Apple II PC","Star Wars movie","MRI scan for patients"],
+  1978:["First IVF baby","GPS satellites","Rollerblades launched"],
+  1979:["Sony Walkman","Snowboarding invented","Cellular network (Japan)"],
+  1980:["Pac-Man game","CNN news channel","Smallpox eradicated"],
+  1981:["IBM PC","Frequent flyer miles","MS-DOS"],
+  1982:["CD audio player","Artificial heart implant","Diet Coke"],
+  1983:["Mobile phone networks (1G)","Microsoft Word","Camcorder camera"],
+  1984:["Apple Macintosh","CD-ROM","Tetris game"],
+  1985:["Windows OS","DNA fingerprinting","New Coke"],
+  1986:["Disposable cameras","Chernobyl disaster","Floppy disk (3.5”)"],
+  1987:["Disposable contact lenses","The Simpsons debuts","Prozac"],
+  1988:["Doppler weather radar","Digital hearing aid","Pan Am Flight 103 bombing"],
+  1989:["World Wide Web idea","Game Boy","Berlin Wall falls"],
+  1990:["Hubble Telescope","Photoshop","Mandela freed"],
+  1991:["Internet for public","Linux OS","First GSM call"],
+  1992:["SMS/text messaging","Smart thermostat","Super Soaker water gun"],
+  1993:["First web browser (Mosaic)","Bagless vacuum","PowerBook laptop"],
+  1994:["Amazon.com","PlayStation","Online video streaming"],
+  1995:["Windows 95","DVD format","Yahoo search"],
+  1996:["Dolly the sheep cloned","USB invented","Hotmail email"],
+  1997:["Wi-Fi","Toyota Prius","Netflix founded"],
+  1998:["Google search engine","iMac","Viagra launched"],
+  1999:["Bluetooth","Napster","BlackBerry smartphone"],
+  2000:["USB drives","Human genome draft","Camera phone"],
+  2001:["iPod","Wikipedia","9/11 attacks"],
+  2003:["Human genome mapped","LinkedIn","Toyota Prius mass sales"],
+  2004:["Facebook","Mars rover Spirit","Podcasts"],
+  2005:["YouTube","Google Maps","Xbox 360"],
+  2006:["Twitter","Blu-ray disc","Pluto demoted"],
+  2007:["iPhone","Kindle","Airbnb"],
+  2008:["Android phones","Tesla Roadster","Bitcoin whitepaper"],
+  2009:["4G network","Bitcoin live","FitBit tracker"],
+  2010:["iPad","Instagram","Electric cars mainstream"],
+  2011:["Siri voice assistant","Mars rover Curiosity","Snapchat"],
+  2012:["CRISPR gene editing","Tesla Model S","Pinterest"],
+  2013:["Xbox One","3D-printed prosthetics","Black Lives Matter"],
+  2014:["Apple Watch","Amazon Alexa","Selfie stick"],
+  2015:["Windows 10","Paris climate deal","Oculus VR headset"],
+  2016:["Pokémon Go","CRISPR human trials","TikTok global"],
+  2017:["Bitcoin high","Solar eclipse","Fidget spinner"],
+  2018:["First gene-edited babies","GDPR law","Black Panther movie"],
+  2019:["First black hole photo","Foldable phones","Greta Thunberg UN speech"],
+  2020:["COVID-19 vaccines","Foldable smartphones","Zoom/WFH surge"],
+  2021:["Mars Perseverance rover","mRNA vaccines","NFT boom"],
+  2022:["James Webb Space Telescope","AI image generation","Electric trucks"],
+  2023:["India Chandrayaan-3 Moon landing","ChatGPT mainstream","AI art boom"],
+  2024:["Zero-power Bluetooth tags","Advanced AI LLMs","Flying vehicle prototypes"],
+  2025:["Solid-state batteries","AI smart glasses","Mars sample mission plans"]
+};
+
+// Show Great Things for the selected year
+function showGreatThings(year) {
+  document.getElementById('great-things-year').textContent = year;
+  const ul = document.getElementById('great-things-list');
+  if (greatThingsData[year]) {
+    ul.innerHTML = greatThingsData[year].map(e => `<li>${e}</li>`).join('');
+  } else {
+    ul.innerHTML = `<li>No data available for that year.</li>`;
+  }
+}
+
+// Button logic
+document.getElementById('greatThingsBtn').onclick = function(){
+  if(!calcBirth){
+    alert("Calculate your age first.");
+    return;
+  }
+  showGreatThings(calcBirth.getFullYear());
+  document.getElementById('resultPage').style.display = "none";
+  document.getElementById('backBtn').style.display = "none";
+  document.getElementById('greatThingsPage').style.display = "block";
+  document.getElementById('backGreatThingsBtn').style.display = "block";
+};
+
+document.getElementById('backGreatThingsBtn').onclick = function(){
+  document.getElementById('greatThingsPage').style.display = "none";
+  showResultView();
+};
+  
 </script>
 </body>
 </html>
