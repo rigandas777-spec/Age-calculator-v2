@@ -5,20 +5,198 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Age Calculator</title>
 <style>
-:root{--bg1:#141e30; --bg2:#292c38; --gold:#ffd700; --glass:rgba(255,255,255,0.08);}
-html,body{height:100%; margin:0; font-family:'Segoe UI',sans-serif;}
-body{background: linear-gradient(135deg,var(--bg1),var(--bg2)); color:#fff; display:flex; align-items:center; justify-content:center; padding:20px;}
-.container{max-width:435px; width:100%; background:var(--glass); padding:30px 18px 22px 18px; border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,0.45); text-align:center; position:relative;}
+  :root {
+  --bg1: #f7f9fa;
+  --bg2: #e8ecef;
+  --glass: rgba(255,255,255,0.98);
+  --gold: #b89329;                /* use for headings ONLY */
+  --txt: #1a2633;                 /* deep modern navy-black for all text/labels */
+  --input-bg: #fff;
+  --input-txt: #141612;           /* pure black for inputs */
+  --btn-bg: linear-gradient(90deg, #ffe076 10%, #b89329 90%);
+  --btn-text: #3a2c01;
+  --highlight: #5d4e23;           /* rich brown for minor highlights */
+  --hint: #6c757d;                /* soft grey for hints */
+  --card-shadow: 0 4px 16px #b8932930;
+}
+/* Major labels, form field labels, results section */
+.present-date-label,
+.ageval-label,
+.stats-label,
+.next-day-label {
+  color: var(--gold) !important;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+/* Result/summary numbers (if you want highlight): */
+/* .ageval-num, .stats-val { color: var(--highlight); } */
+
+/* Headings/accent only */
+h1, .next-birthday-title {
+  color: var(--gold);
+  font-weight: 900;
+}
+
+/* Input fields use strong black for text */
+input, .input-date {
+  background: var(--input-bg);
+  color: var(--input-txt);
+  border: 1.5px solid #e4e6eb;
+  font-weight: 500;
+}
+
+input::placeholder, .input-date::placeholder {
+  color: #7a8288;
+  opacity: 1;
+}
+
+/* Hints/help text */
+.hint {
+  color: var(--hint);
+  font-weight: 500;
+  font-size:1em;
+  opacity: 1;
+}
+/* FORCE readable light text on cards with dark backgrounds, even in light theme */
+.stats-cell,
+.planet-cell,
+.age-big-box,
+.birthday-countdown-box,
+.next-birt-box {
+  color: #fff !important;
+}
+
+.stats-label,
+.planet-label,
+.stats-val,
+.planet-val,
+.ageval-label,
+.ageval-num,
+.next-birthday-title,
+.countdown-val,
+.countdown-unit,
+.you-lived-title,
+.youlived-label,
+.youlived-val {
+  color: #ffd700 !important;   /* Use gold for accent labels/numbers */
+}
+
+.stats-reason, .planet-reason {
+  color: #ffe066 !important;   /* Lighter gold for reason/hint under numbers */
+}
+
+  
+body.dark-theme {
+  --bg1: #141e30;
+  --bg2: #292c38;
+  --gold: #ffd700;
+  --glass: rgba(255,255,255,0.08);
+  --txt: #fff;
+  --input-bg: rgba(255,255,255,0.09);
+  --btn-bg: linear-gradient(90deg,var(--gold),#ffcc33);
+  --btn-text: #000;
+}
+body {
+  background: linear-gradient(135deg, var(--bg1), var(--bg2));
+  color: var(--txt);
+  transition: background 0.25s, color 0.2s;
+}
+input, .input-date {
+  background: var(--input-bg);
+  color: var(--txt);
+  border: none;
+}
+button, .calc, .extra-btn, .planet-btn, #backBtn, #backLifeBtn, #backPlanetBtn {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  transition: background 0.13s, color 0.13s;
+}
+input, .input-date {
+  background: var(--input-bg);
+  color: var(--input-txt);
+  border: 1.5px solid #e4e6eb;
+  font-weight: 500;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 16px;
+  width: 120px;
+  text-align: center;
+}
+
+input::placeholder, .input-date::placeholder {
+  color: #979ba7;
+  opacity: 1;
+}
+.present-date-label {
+  color: var(--highlight);
+  font-weight: 700;
+  margin-right: 7px;
+}
+.hint {
+  color: var(--hint);
+  font-size: 1em;
+  font-weight: 500;
+  opacity: 0.98;
+}
+/* --- High readability label and input colors for LIGHT THEME ONLY --- */
+.present-date-label,
+.ageval-label,
+.stats-label,
+.next-day-label,
+label,
+.youlived-label,
+.you-lived-title {
+  color: var(--txt);
+  font-weight: 600;
+}
+
+input, .input-date {
+  background: var(--input-bg);
+  color: var(--input-txt);
+  border: 1.5px solid #e4e6eb;
+  font-weight: 500;
+}
+
+input::placeholder, .input-date::placeholder {
+  color: #7a8288;
+  opacity: 1;
+}
+
+.hint {
+  color: var(--hint);
+  font-weight: 500;
+  font-size: 1em;
+  opacity: 1;
+}
+body:not(.dark-theme) .you-lived-title {
+  color: var(--txt) !important;   /* matches your dark label color */
+  text-shadow: none !important;
+}
+
+.container {
+  max-width: 435px;
+  width: 100%;
+  background: var(--glass);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  border: 1.5px solid #ece6d7;
+  padding: 14px 18px 22px 18px;  /* or (12px 18px ...) for a tighter fit! */
+  margin-top: 32px;              /* pushes card down below the switch */
+  text-align: center;
+  position: relative;
+}
+
 h1{margin:4px 0 18px 0; font-size:28px; color:var(--gold);}
-.hint{margin-bottom:9px; color:#ffe066;}
+
 .row{display:flex;align-items:center;justify-content:center;margin-bottom:15px;gap:8px;}
 .calendar-wrap{position:relative;display:inline-block;}
-.input-date{ width:120px; padding:10px; border-radius:10px; border:none; background:rgba(255,255,255,0.09); color:#fff; font-size:16px; text-align:center;}
+
 input[type="date"].calendar-proxy{
   opacity:0; position:absolute; left:0;top:0;width:100%;height:100%;border:none;cursor:pointer;z-index:10;
 }
 .calendar-btn{background:rgba(0,0,0,0.07);padding:10px 12px;border-radius:10px;border:none;color:var(--gold);font-size:18px;cursor:pointer;position:relative;z-index:1;}
-.present-date-label{color:#ffd700;font-weight:600;margin-right:7px;}
+
 button.calc, .extra-btn, .planet-btn, #backBtn, #backLifeBtn, #backPlanetBtn {
   width:100%; padding:12px; border-radius:10px; font-size:16px; font-weight:600; border:none; cursor:pointer;
   margin-bottom:10px; transition:background .13s;
@@ -29,18 +207,18 @@ button.calc {background:linear-gradient(90deg,var(--gold),#ffcc33); color:#000;}
 .age-big-box {display:flex; gap:18px; justify-content:center; background:rgba(30,30,30,0.98); padding:18px 0 14px 0; border-radius:14px; box-shadow:0 3px 18px rgba(30,30,10,.13);width:100%;margin-bottom:14px;}
 .ageval-col{flex:1;}
 .ageval-num{font-size:36px; color:var(--gold); font-weight:900;}
-.ageval-label{font-size:15px; font-weight:600; color:#ffe066; margin-top:2px; letter-spacing:.06em;}
+
 .next-birt-box{background:rgba(38,38,26,0.98); border-radius:12px; padding:12px 8px 9px 8px; margin:0 0 14px 0;text-align:center; font-size:18px;}
 .next-birthday-title{color:#ffd700; font-weight:bold; font-size:16px;}
 .next-bday-row{margin-top:5px; font-size:19px;}
-.next-day-label{color:#ffe066; font-size: 15px;}
+
 .birthday-countdown-box{padding:18px 0 10px 0;background:rgba(30,30,20,.93);border-radius:14px; display:flex;justify-content:center;gap:35px;align-items:center; margin:0 0 18px 0; font-weight:bold; letter-spacing:2px; box-shadow:0 2px 8px #0001;}
 .countdown-val{ font-size:26px; color:var(--gold); min-width:40px;transition:.13s;}
 .countdown-unit {font-size:13px;color:#ffe066;}
 .you-lived-box {background: rgba(255,255,255,0.10);border-radius:14px; padding:18px 10px 12px 10px; margin:0 0 16px 0;text-align:center; box-shadow:0 2px 16px rgba(0,0,0,.18);}
 .you-lived-title {color:#fff; font-size:18px; font-weight:700; margin-bottom:10px; letter-spacing:.5px; text-shadow:0 1px 4px #1119;}
 .youlived-grid {display:grid; grid-template-columns:repeat(2,1fr); gap:8px; font-size:16px;}
-.youlived-label {color:#ffd700; font-weight:600;}
+
 .youlived-val {font-size:18px; font-weight:700;}
 .life-btm-btns{margin-top:15px;}
 #lifeStatisticsPage, #planetsPage {display:none; width:100%; animation: fadeIn .5s;}
@@ -48,7 +226,7 @@ button.calc {background:linear-gradient(90deg,var(--gold),#ffcc33); color:#000;}
 .stats-grid24, #planetsGrid {display:grid; grid-template-columns:1fr 1fr; gap:27px 16px; margin:0 0 18px 0;}
 .stats-cell, .planet-cell {background:rgba(40,30,10,0.97); box-shadow:0 2px 11px #241a09a0; border-radius:13px; padding:18px 10px 16px 10px; display:flex; flex-direction:column;align-items:center; min-height:90px; min-width:120px;}
 .stat-emoji, .planet-emoji {font-size:28px;filter: drop-shadow(0 1px 2px #000b);margin-bottom:6px;}
-.stats-label, .planet-label {color:#ffd700; font-weight:600; font-size:15px; margin-bottom:3px; text-align:center;}
+
 .stats-val, .planet-val {color:#fff; font-weight:bold; font-size:22px; margin-bottom:5px; margin-top:2px; letter-spacing:1px; text-shadow:0 1px 4px #1118;}
 .stats-reason, .planet-reason {font-size:13px; color:#ffe066; opacity:.90; margin-top:5px; text-align:center;}
 .lifestat-progressbox{background:rgba(38,38,26,0.97); box-shadow:0 2px 11px #241a09a0; border-radius:13px; padding:17px 10px 13px 10px; margin-bottom:16px;}
@@ -159,9 +337,91 @@ body{overflow-x:hidden; overflow-y:auto;}
   line-height: 1;
 }
 
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-size: 1.25em;
+  font-weight: bold;
+  user-select: none;
+}
+.theme-toggle input {
+  display: none;
+}
+.theme-toggle .icon {
+  font-size: 1.25em;
+  transition: color 0.2s;
+  color: #ffd700;
+  filter: drop-shadow(0 0 1px #ffd70070);
+}
+.theme-toggle .icon.sun { margin-right: 7px; }
+.theme-toggle .icon.moon { margin-left: 7px; }
+.theme-toggle .slider {
+  width: 48px;
+  height: 24px;
+  background: linear-gradient(90deg,#ffe066,#ffd700 85%);
+  border-radius: 99px;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  box-shadow: 0 2px 10px #ffd60010;
+  transition: background 0.22s;
+}
+.theme-toggle .slider::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fffbe5;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px #ffd70052;
+  transition: transform 0.2s cubic-bezier(.44,1.9,.44,.92), background 0.2s;
+}
+.theme-toggle input:checked + .slider::before {
+  transform: translateX(24px); /* Moves right */
+  background: #514587;
+}
+.theme-toggle input:checked + .slider {
+  background: linear-gradient(90deg,#2d3255 10%,#3b2043 90%);
+}
+.theme-toggle input:checked ~ .icon.sun {
+  color: #bbb;
+  filter: grayscale(0.6);
+}
+.theme-toggle input:not(:checked) ~ .icon.moon {
+  color: #bbb;
+  filter: grayscale(0.6);
+}
+  #theme-switch-wrap {
+  
+  top: 4px;  /* or 0 or 2px if you want */
+  left: 14px;
+  z-index: 1200;
+}
+@media (max-width: 600px) {
+  #theme-switch-wrap {
+    top: 1.5px;
+    left: 6px;
+    transform: scale(0.95);
+  }
+}
+
 </style>
+
 </head>
 <body>
+  <div id="theme-switch-wrap">
+  <label class="theme-toggle">
+    <span class="icon sun">☀️</span>
+    <input type="checkbox" id="theme-switch">
+    <span class="slider"></span>
+    <span class="icon moon">🌙</span>
+  </label>
+</div>
+
+
 <div class="container" id="app">
   <div id="inputArea">
     <h1>Age Calculator</h1>
@@ -246,6 +506,8 @@ body{overflow-x:hidden; overflow-y:auto;}
     <ul id="great-things-list" class="great-things-premium-list"></ul>
   </div>
 </div>
+  <div id="scroll-debug" style="position:fixed;bottom:10px;left:10px;background:yellow;padding:10px;color:#222;font-size:14px;z-index:9999"></div>
+
 <script>
 function pad(n) {return n<10?'0'+n:n;}
 const el=id=>document.getElementById(id);
@@ -721,11 +983,53 @@ function navShow(pageId) {
   // Push browser state (except on popstate, to avoid double state)
   if(!navShow.__fromPop) history.pushState({pageId}, "");
   navShow.__fromPop = false;
+  // Old code that switches views
+
+setTimeout(() => {
+  window.scrollTo(0, 0);
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+  
+  // Also log their values in your debug viewer
+  document.getElementById('scroll-debug').innerHTML +=
+    "<br>body.scrollTop=" + document.body.scrollTop +
+    "<br>html.scrollTop=" + document.documentElement.scrollTop;
+}, 450);
+
 }
 
 // Modify your navigation calls:
 //  - after showResultView(), call navShow('resultPage');
 //
+(function() {
+  const themeSwitch = document.getElementById('theme-switch');
+  // On page load, check if user has a saved theme
+  const saved = localStorage.getItem('theme-mode');
+  if(saved === 'dark') {
+    document.body.classList.add('dark-theme');
+    if(themeSwitch) themeSwitch.checked = true;
+  } else if(saved === 'light') {
+    document.body.classList.remove('dark-theme');
+    if(themeSwitch) themeSwitch.checked = false;
+  }
+
+  // System preference if no explicit user setting:
+  if(!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.classList.add('dark-theme');
+    if(themeSwitch) themeSwitch.checked = true;
+  }
+
+  // Change theme on switch
+  if(themeSwitch) themeSwitch.addEventListener('change', function() {
+    if(themeSwitch.checked) {
+      document.body.classList.add('dark-theme');
+      localStorage.setItem('theme-mode', 'dark');
+    } else {
+      document.body.classList.remove('dark-theme');
+      localStorage.setItem('theme-mode', 'light');
+    }
+  });
+})();
 
 </script>
 </body>
