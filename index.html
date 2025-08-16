@@ -515,6 +515,49 @@ let calcBirth = null, calcPresentDate = null;
 let liveCountdownInterval = null;
 let youLivedInterval = null;
 const AVG_LIFE_EXPECTANCY = 73; // years; edit to your country if desired
+  // ---------- paste this near the top of your script (before navShow) ----------
+function scrollToTopRobust() {
+  // primary: standard scrolling element
+  const scroller = document.scrollingElement || document.documentElement || document.body;
+  try {
+    if (scroller && typeof scroller.scrollTo === 'function') {
+      scroller.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+    if (scroller) scroller.scrollTop = 0;
+  } catch (e) { /* ignore */ }
+
+  // also reset likely app/container scrollers
+  const possible = [
+    document.getElementById('app'),
+    document.querySelector('.container'),
+    document.querySelector('#inputArea'),
+    document.querySelector('#resultPage'),
+    document.querySelector('#lifeStatisticsPage'),
+    document.querySelector('#planetsPage'),
+    document.querySelector('#greatThingsPage')
+  ];
+  possible.forEach(el => { try { if (el && el.scrollTop) el.scrollTop = 0; } catch(e){} });
+
+  // Mobile visual viewport sometimes needs a retry after layout settles
+  if (window.visualViewport) {
+    // tiny retry after viewport settle
+    setTimeout(()=> {
+      try { (document.scrollingElement || document.documentElement).scrollTop = 0; } catch(e){}
+      try { window.scrollTo(0,0); } catch(e){}
+    }, 200);
+  } else {
+    setTimeout(()=> { try{ window.scrollTo(0,0); }catch(e){} }, 120);
+  }
+}
+// -----------------------------------------------------------------------
+// lightweight helper: blur any focused element and run robust scroll (with a retry)
+function doTopAfterView() {
+  try { if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur(); } catch(e){}
+  try { scrollToTopRobust(); } catch(e){}
+  // small retry for mobile visualViewport/address-bar quirks
+  setTimeout(()=>{ try{ scrollToTopRobust(); window.scrollTo(0,0); } catch(e){} }, 150);
+}
+
 window.addEventListener('DOMContentLoaded', function(){
   let today = new Date();
   el('presentDateInput').value = formatDate(today);
@@ -571,6 +614,7 @@ function showInputView() {
   el('typeHint').textContent = '';
   clearIntervals();
   navShow('inputArea');
+  doTopAfterView();
 }
 function showResultView() {
   el('inputArea').style.display = 'none';
@@ -579,6 +623,7 @@ function showResultView() {
   el('lifeStatisticsPage').style.display = 'none';
   el('planetsPage').style.display = 'none';
   navShow('resultPage');
+  doTopAfterView();
 }
 function clearIntervals(){
   if(liveCountdownInterval) clearInterval(liveCountdownInterval);
@@ -811,6 +856,7 @@ el('lifeStatsBtn2').onclick=function(){
   el('backBtn').style.display="none";
   el('lifeStatisticsPage').style.display="block";
   el('backLifeBtn').style.display="block";
+    doTopAfterView();
 };
 // PLANETS stays the same
 const planetEmoji = ["☿️","♀️","🌍","♂️","♃","♄","♅","♆"];
@@ -846,6 +892,7 @@ el('planetBtn').onclick=function(){
   el('backBtn').style.display = "none";
   el('planetsPage').style.display="block";
   el('backPlanetBtn').style.display="block";
+    doTopAfterView();
 };
   // ==== Great Things Data (1940–2025) ====
 const greatThingsData = {
@@ -959,6 +1006,7 @@ document.getElementById('greatThingsBtn').onclick = function(){
   document.getElementById('backBtn').style.display = "none";
   document.getElementById('greatThingsPage').style.display = "block";
   document.getElementById('backGreatThingsBtn').style.display = "block";
+  doTopAfterView();
 };
 
 document.getElementById('backGreatThingsBtn').onclick = function(){
@@ -986,15 +1034,18 @@ function navShow(pageId) {
   // Old code that switches views
 
 setTimeout(() => {
-  window.scrollTo(0, 0);
-  document.body.scrollTop = 0;
-  document.documentElement.scrollTop = 0;
-  
-  // Also log their values in your debug viewer
-  document.getElementById('scroll-debug').innerHTML +=
-    "<br>body.scrollTop=" + document.body.scrollTop +
-    "<br>html.scrollTop=" + document.documentElement.scrollTop;
-}, 450);
+  try {
+    scrollToTopRobust();   // use the function from above
+  } catch(e) { /* ignore */ }
+
+  const sd = document.getElementById('scroll-debug');
+  if (sd) {
+    sd.innerHTML +=
+      "<br>body.scrollTop=" + document.body.scrollTop +
+      "<br>html.scrollTop=" + document.documentElement.scrollTop;
+  }
+}, 250);
+
 
 }
 
@@ -1034,3 +1085,4 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+  
